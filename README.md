@@ -14,7 +14,7 @@
 
 ## SETUP  
 
-- Set your nom-sensetive configurations in the file ./config.py  
+- Set your non-sensitive configurations in the file ./config.py  
 - Create your Mysql database  
 
 Let's assume you choose the following configuration:  
@@ -26,7 +26,7 @@ Let's assume you choose the following configuration:
 |Password| password|
 |Host| localhost|
 
-- Set your SENSETIVE configurations in the file ./instance/config.py  
+- Set your sensitive configurations in the file ./instance/config.py  
 
 For the configuration above, the variable [SQLALCHEMY_DATABASE_URI] in the file [./instance/config.py] must be:
 
