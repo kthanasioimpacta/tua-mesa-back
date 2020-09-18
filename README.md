@@ -50,3 +50,8 @@ For the configuration above, the variable [SQLALCHEMY_DATABASE_URI] in the file 
 - flask db migrate -m "What's the change"  
 - flask db upgrade  
 
+## APIS
+
+- Install POSTMAN application and import this collection:
+
+<code>https://www.getpostman.com/collections/42dba093768b05a82edf</code>
