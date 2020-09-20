@@ -14,4 +14,7 @@ class Company(db.Model):
     waiting_lines = db.relationship('WaitingLine', backref='company', lazy=True)
     company_configs = db.relationship('CompanyConfig', backref='company', lazy=True)
 
+    __table_args__ = (db.UniqueConstraint('phone_region', 'phone_number', name='_company_uc'),
+                     )
+
 

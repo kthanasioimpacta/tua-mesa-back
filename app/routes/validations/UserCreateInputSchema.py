@@ -10,7 +10,6 @@ class UserCreateInputSchema(Schema):
      - password:  (str)
      - email:  (str)
      - company_id: (int)
-     - phone_region:  (str) 
      - phone_number:  (str) 
      - role_id: (int) 
      
@@ -19,7 +18,6 @@ class UserCreateInputSchema(Schema):
     password = fields.Str(required=True)
     email = fields.Str(required=True)
     company_id = fields.Int(required=True)
-    phone_region = fields.Str(required=True)
     phone_number = fields.Str(required=True)
     role_id = fields.Int(required=True)
 
@@ -27,9 +25,3 @@ class UserCreateInputSchema(Schema):
     def is_not_admin(self,value):
         if value == 'admin':
             raise ValidationError("Username already exists")
-
-    # @validates('phone_region')
-    # def is_valid_format(self,value):
-        
-    #     if not re.match(r'(\+[0-9]+\s*)?(\([0-9]+\))?([\s0-9\-]+[0-9]+)', value):
-    #         raise ValidationError("Invalid Phone Region Format")

@@ -26,11 +26,15 @@ def new_user():
         return (jsonify({'errors': error_list}), 400)
     username = req_data['username']
     email = req_data['email']
+    if 'phone_region' not in req_data:
+        phone_region = '+55'
+    else:
+        phone_region = req_data['phone_region']
     user = User(username=username, 
                 email=email, 
                 company_id=req_data['company_id'], 
                 phone_number=req_data['phone_number'], 
-                phone_region=req_data['phone_region'], 
+                phone_region=phone_region, 
                 role_id=req_data['role_id'], 
                 status=1, # ATIVO
                 created_at=datetime.now(),
@@ -56,6 +60,8 @@ def new_user():
 
 @api.route('/api/users/<int:id>', methods=['GET'])
 def get_user(id):
+    if not is_logged():
+        return (jsonify({'message': 'Not Authorized' })), 401
     user = User.query.get(id)
     if not user:
         return (jsonify({'message': 'User not found'}), 404)
@@ -71,7 +77,7 @@ def get_user(id):
     return response
 
 
-@api.route('/api/login')
+@api.route('/api/users/login')
 @auth.login_required
 def get_auth_token():
     token = g.user.generate_auth_token(600)
@@ -93,9 +99,9 @@ def verify_password(pid, password='password'):
     g.user = user
     return True
 
-@api.route('/api/currentuser')
+@api.route('/api/users/currentuser')
 def get_resource():
-    if not verify_password(request.cookies.get('token')):
+    if not is_logged():
         return (jsonify({'message': 'Not Authorized' })), 401
     response = flask.make_response({ 'data': {
                                         'id': g.user.id,
@@ -105,3 +111,6 @@ def get_resource():
                                         'phone_number': g.user.phone_number,
                                         'status': g.user.status}}, 200)
     return response
+
+def is_logged():
+    return verify_password(request.cookies.get('token'))

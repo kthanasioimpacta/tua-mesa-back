@@ -11,5 +11,6 @@ class WaitingLine(db.Model):
     created_at = db.Column(db.DateTime, nullable=False)
     updated_at = db.Column(db.DateTime, nullable=False)
     line_ups = db.relationship('LineUp', backref='waiting_line', lazy=True)
+    __table_args__ = (db.UniqueConstraint('company_id', 'name', name='_company_wait_line_uc'),)
 
 
