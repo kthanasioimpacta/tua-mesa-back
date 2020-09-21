@@ -11,6 +11,9 @@ from app.models.WaitingLine import WaitingLine
 from app.routes.validations.WaitingLineCreateInputSchema import WaitingLineCreateInputSchema
 
 from datetime import datetime
+from app.shared.Util import format_datetime
+
+from app.shared.Authentication import is_logged, is_admin
 
 auth = HTTPBasicAuth()
 
@@ -24,6 +27,11 @@ def new_waiting_line():
         error_list.append({k: v})
     if errors:
         return (jsonify({'errors': error_list}), 400)
+
+
+    if not is_logged() or req_data['company_id'] != g.user.company_id or not is_admin():
+        return (jsonify({'message': 'Not Authorized' })), 401
+        
     name = req_data['name']
     waiting_line = WaitingLine(name=name,
                 company_id=req_data['company_id'],
@@ -44,23 +52,54 @@ def new_waiting_line():
                                         'company_id': waiting_line.company_id,
                                         'name': waiting_line.name, 
                                         'is_priority': waiting_line.is_priority,
-                                        'status': waiting_line.status}}), 201)
+                                        'status': waiting_line.status,
+                                        'created_at': format_datetime(waiting_line.created_at),
+                                        'updated_at': format_datetime(waiting_line.updated_at)}}), 201)
     response.headers["Content-Type"] = "application/json"
     return response
 
 
+@api.route('/api/waiting-lines', methods=['GET'])
+def get_waiting_lines():
+    if not is_logged():
+        return (jsonify({'message': 'Not Authorized' })), 401
+
+    waiting_lines = WaitingLine.query.filter_by(company_id=g.user.company_id).all()
+    if not waiting_lines:
+        return (jsonify({'message': 'No Waiting Lines found'}), 404)
+    resp = {'data': []} 
+    for waiting_line in waiting_lines:
+        resp['data'].append( {  'id': waiting_line.id,
+                                'company_id': waiting_line.company_id,
+                                'name': waiting_line.name, 
+                                'is_priority': waiting_line.is_priority,
+                                'status': waiting_line.status,
+                                'created_at': format_datetime(waiting_line.created_at),
+                                'updated_at': format_datetime(waiting_line.updated_at)})
+    response = flask.make_response(jsonify(resp), 200)
+    
+    response.headers["Content-Type"] = "application/json"
+    return response
+
 @api.route('/api/waiting-lines/<int:id>', methods=['GET'])
 def get_waiting_line(id):
+
     waiting_line = WaitingLine.query.get(id)
     if not waiting_line:
         return (jsonify({'message': 'Waiting Line not found'}), 404)
     
+    if not is_logged() or waiting_line.company_id != g.user.company_id:
+        return (jsonify({'message': 'Not Authorized' })), 401
+
+
     response = flask.make_response(jsonify({ 'data': {
                                         'id': waiting_line.id,
                                         'company_id': waiting_line.company_id,
                                         'name': waiting_line.name, 
                                         'is_priority': waiting_line.is_priority,
-                                        'status': waiting_line.status}}), 200)
+                                        'status': waiting_line.status,
+                                        'created_at': format_datetime(waiting_line.created_at),
+                                        'updated_at': format_datetime(waiting_line.updated_at)}}), 200)
     response.headers["Content-Type"] = "application/json"
     return response
 
@@ -87,18 +126,18 @@ def verify_password(pid, password='password'):
     g.user = user
     return True
 
-@api.route('/api/companies/currentuser')
-def get_current_waiting_line():
-    if not is_logged():
-        return (jsonify({'message': 'Not Authorized' })), 401
-    response = flask.make_response({ 'data': {
-                                        'id': g.user.id,
-                                        'username': g.user.username, 
-                                        'email': g.user.email,
-                                        'phone_region': g.user.phone_region,
-                                        'phone_number': g.user.phone_number,
-                                        'status': g.user.status}}, 200)
-    return response
+# @api.route('/api/companies/currentuser')
+# def get_current_waiting_line():
+#     if not is_logged():
+#         return (jsonify({'message': 'Not Authorized' })), 401
+#     response = flask.make_response({ 'data': {
+#                                         'id': g.user.id,
+#                                         'username': g.user.username, 
+#                                         'email': g.user.email,
+#                                         'phone_region': g.user.phone_region,
+#                                         'phone_number': g.user.phone_number,
+#                                         'status': g.user.status}}, 200)
+#     return response
 
-def is_logged():
-    return verify_password(request.cookies.get('token'))
+# def is_logged():
+#     return verify_password(request.cookies.get('token'))

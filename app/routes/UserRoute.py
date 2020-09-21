@@ -2,7 +2,7 @@
 import flask
 from flask import request, jsonify, g
 from app import db
-from sqlalchemy import or_
+from sqlalchemy import or_, and_
 from flask_httpauth import HTTPBasicAuth
 
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -11,6 +11,7 @@ from app.models.User import User
 from app.routes.validations.UserCreateInputSchema import UserCreateInputSchema
 
 from datetime import datetime
+from app.shared.Util import format_datetime
 
 auth = HTTPBasicAuth()
 
@@ -51,10 +52,14 @@ def new_user():
     response = flask.make_response(jsonify({ 'data': {
                                         'id': user.id,
                                         'username': user.username, 
+                                        'company_id': user.company_id,
                                         'email': user.email,
                                         'phone_region': user.phone_region,
                                         'phone_number': user.phone_number,
-                                        'status': user.status}}), 201)
+                                        'status': user.status,
+                                        'role_id': user.role_id,
+                                        'created_at': format_datetime(user.created_at),
+                                        'updated_at': format_datetime(user.updated_at)}}), 201)
     response.headers["Content-Type"] = "application/json"
     return response
 
@@ -63,17 +68,21 @@ def new_user():
 def get_user(id):
     if not is_logged():
         return (jsonify({'message': 'Not Authorized' })), 401
-    user = User.query.get(id)
+    user = User.query.filter(and_(User.id==id,User.company_id==g.user.company_id)).first()
     if not user:
         return (jsonify({'message': 'User not found'}), 404)
     
     response = flask.make_response(jsonify({ 'data': {
                                         'id': user.id,
                                         'username': user.username, 
+                                        'company_id': user.company_id,
                                         'email': user.email,
                                         'phone_region': user.phone_region,
                                         'phone_number': user.phone_number,
-                                        'status': user.status}}), 200)
+                                        'status': user.status,
+                                        'role_id': user.role_id,
+                                        'created_at': format_datetime(user.created_at),
+                                        'updated_at': format_datetime(user.updated_at)}}), 200)
     response.headers["Content-Type"] = "application/json"
     return response
 
@@ -101,16 +110,20 @@ def verify_password(pid, password='password'):
     return True
 
 @api.route('/api/users/currentuser')
-def get_resource():
+def get_current_user():
     if not is_logged():
         return (jsonify({'message': 'Not Authorized' })), 401
     response = flask.make_response({ 'data': {
                                         'id': g.user.id,
                                         'username': g.user.username, 
+                                        'company_id': g.user.company_id,
                                         'email': g.user.email,
                                         'phone_region': g.user.phone_region,
                                         'phone_number': g.user.phone_number,
-                                        'status': g.user.status}}, 200)
+                                        'status': g.user.status,
+                                        'role_id': g.user.role_id,
+                                        'created_at': format_datetime(g.user.created_at),
+                                        'updated_at': format_datetime(g.user.updated_at)}}, 200)
     return response
 
 def is_logged():

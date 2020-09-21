@@ -11,6 +11,7 @@ from app.models.LineUp import LineUp
 from app.routes.validations.LineUpCreateInputSchema import LineUpCreateInputSchema
 
 from datetime import datetime
+from app.shared.Util import format_datetime
 
 auth = HTTPBasicAuth()
 
@@ -40,7 +41,8 @@ def new_line_up():
                                         'id': line_up.id,
                                         'customer_id': line_up.customer_id,
                                         'waiting_line_id': line_up.waiting_line_id,
-                                        'status': line_up.status}}), 201)
+                                        'status': line_up.status,
+                                        'joined_at': format_datetime(line_up.joined_at)}}), 201)
     response.headers["Content-Type"] = "application/json"
     return response
 
@@ -60,7 +62,7 @@ def get_next_customer():
                                         'customer_id': next_customer.customer_id,
                                         'waiting_line_id': next_customer.waiting_line_id,
                                         'status': next_customer.status,
-                                        'joined_at': next_customer.joined_at}}), 200)
+                                        'joined_at': format_datetime(next_customer.joined_at) }}), 200)
     response.headers["Content-Type"] = "application/json"
     return response
 
@@ -91,11 +93,11 @@ def call_customer(id):
                                         'id': line_up.id,
                                         'customer_id': line_up.customer_id,
                                         'waiting_line_id': line_up.waiting_line_id,
-                                        'joined_at': line_up.joined_at,
-                                        'first_call_at': line_up.first_call_at,
-                                        'second_call_at': line_up.second_call_at,
-                                        'completed_call_at': line_up.completed_call_at,
-                                        'cancelled_call_at': line_up.cancelled_call_at,
+                                        'joined_at': format_datetime(line_up.joined_at),
+                                        'first_call_at': format_datetime(line_up.first_call_at),
+                                        'second_call_at': format_datetime(line_up.second_call_at),
+                                        'completed_call_at': format_datetime(line_up.completed_call_at),
+                                        'cancelled_call_at': format_datetime(line_up.cancelled_call_at),
                                         'status': line_up.status}}), 200)
     response.headers["Content-Type"] = "application/json"
     return response
@@ -123,18 +125,18 @@ def verify_password(pid, password='password'):
     g.user = user
     return True
 
-@api.route('/api/companies/currentuser')
-def get_current_line_up():
-    if not is_logged():
-        return (jsonify({'message': 'Not Authorized' })), 401
-    response = flask.make_response({ 'data': {
-                                        'id': g.user.id,
-                                        'username': g.user.username, 
-                                        'email': g.user.email,
-                                        'phone_region': g.user.phone_region,
-                                        'phone_number': g.user.phone_number,
-                                        'status': g.user.status}}, 200)
-    return response
+# @api.route('/api/companies/currentuser')
+# def get_current_line_up():
+#     if not is_logged():
+#         return (jsonify({'message': 'Not Authorized' })), 401
+#     response = flask.make_response({ 'data': {
+#                                         'id': g.user.id,
+#                                         'username': g.user.username, 
+#                                         'email': g.user.email,
+#                                         'phone_region': g.user.phone_region,
+#                                         'phone_number': g.user.phone_number,
+#                                         'status': g.user.status}}, 200)
+#     return response
 
-def is_logged():
-    return verify_password(request.cookies.get('token'))
+# def is_logged():
+#     return verify_password(request.cookies.get('token'))

@@ -11,6 +11,9 @@ from app.models.Customer import Customer
 from app.routes.validations.CustomerCreateInputSchema import CustomerCreateInputSchema
 
 from datetime import datetime
+from app.shared.Util import format_datetime
+
+from app.shared.Authentication import is_logged, is_admin
 
 auth = HTTPBasicAuth()
 
@@ -24,6 +27,10 @@ def new_customer():
         error_list.append({k: v})
     if errors:
         return (jsonify({'errors': error_list}), 400)
+
+    if not is_logged():
+        return (jsonify({'message': 'Not Authorized' })), 401
+
     name = req_data['name']
     if 'phone_region' not in req_data:
         phone_region = '+55'
@@ -59,13 +66,19 @@ def new_customer():
                                         'phone_number': customer.phone_number,
                                         'description': description,
                                         'email': email,
-                                        'status': customer.status}}), 201)
+                                        'status': customer.status,
+                                        'created_at': format_datetime(customer.created_at),
+                                        'updated_at': format_datetime(customer.updated_at)}}), 201)
     response.headers["Content-Type"] = "application/json"
     return response
 
 
 @api.route('/api/customers/<int:id>', methods=['GET'])
 def get_customer(id):
+
+    if not is_logged():
+        return (jsonify({'message': 'Not Authorized' })), 401
+
     customer = Customer.query.get(id)
     if not customer:
         return (jsonify({'message': 'Customer not found'}), 404)
@@ -77,45 +90,9 @@ def get_customer(id):
                                         'phone_number': customer.phone_number,
                                         'description': customer.description,
                                         'email': customer.email,
-                                        'status': customer.status}}), 200)
+                                        'status': customer.status,
+                                        'created_at': format_datetime(customer.created_at),
+                                        'updated_at': format_datetime(customer.updated_at)}}), 200)
     response.headers["Content-Type"] = "application/json"
     return response
 
-
-# @api.route('/api/companies/login')
-# @auth.login_required
-# def get_auth_token():
-#     token = g.user.generate_auth_token(600)
-
-#     response = flask.make_response({'token': token.decode('ascii'), 'duration': 600}, 200)
-#     response.headers["Content-Type"] = "application/json"
-#     response.set_cookie('token', token.decode('ascii'), secure=False)
-#     return response
-
-@auth.verify_password
-def verify_password(pid, password='password'):
-    # first try to authenticate by token
-    user = User.verify_auth_token(pid)
-    if not user:
-        # try to authenticate with username/password
-        user = User.query.filter_by(username=pid).first()
-        if not user or not user.verify_password(password):
-            return False
-    g.user = user
-    return True
-
-@api.route('/api/customers/currentuser')
-def get_current_customer():
-    if not is_logged():
-        return (jsonify({'message': 'Not Authorized' })), 401
-    response = flask.make_response({ 'data': {
-                                        'id': g.user.id,
-                                        'username': g.user.username, 
-                                        'email': g.user.email,
-                                        'phone_region': g.user.phone_region,
-                                        'phone_number': g.user.phone_number,
-                                        'status': g.user.status}}, 200)
-    return response
-
-def is_logged():
-    return verify_password(request.cookies.get('token'))

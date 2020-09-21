@@ -29,7 +29,7 @@ class User(db.Model):
         return check_password_hash(self.password, password)
 
     def generate_auth_token(self, expires_in=600):
-        payload = {'id': self.id, 'exp': time.time() + expires_in}
+        payload = {'id': self.id, 'company_id': self.company_id, 'exp': time.time() + expires_in}
         return jwt.encode(
             payload,
             current_app.config['SECRET_KEY'], algorithm='HS256')
