@@ -24,6 +24,7 @@ def new_user():
         error_list.append({k: v})
     if errors:
         return (jsonify({'errors': error_list}), 400)
+
     username = req_data['username']
     email = req_data['email']
     if 'phone_region' not in req_data:
