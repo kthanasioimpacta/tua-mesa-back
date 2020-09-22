@@ -12,21 +12,21 @@ from app.routes.validations.CustomerCreateInputSchema import CustomerCreateInput
 
 from datetime import datetime
 from app.shared.Util import format_datetime
-
+from app.shared.HandleRequestValidation import handle_request_validation
 from app.shared.Authentication import is_logged, is_admin
+
+from app.routes.validations.errors.ValidationError import ValidationError
 
 auth = HTTPBasicAuth()
 
-create_company_schema = CustomerCreateInputSchema()
 @api.route('/api/customers', methods=['POST'])
 def new_customer():
     req_data = request.get_json()
-    errors = create_company_schema.validate(req_data)
-    error_list = []
-    for k, v in errors.items():
-        error_list.append({k: v})
-    if errors:
-        return (jsonify({'errors': error_list}), 400)
+    data_schema = CustomerCreateInputSchema()
+    try:
+        handle_request_validation(data_schema)
+    except ValidationError as err:
+        return jsonify(err.message), 400
 
     if not is_logged():
         return (jsonify({'message': 'Not Authorized' })), 401

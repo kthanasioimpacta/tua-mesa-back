@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import flask
-from flask import request, jsonify, g
+from flask import request, jsonify, g, current_app
 from app import db
 from sqlalchemy import or_, and_
 from flask_httpauth import HTTPBasicAuth
@@ -13,18 +13,19 @@ from app.routes.validations.UserCreateInputSchema import UserCreateInputSchema
 from datetime import datetime
 from app.shared.Util import format_datetime
 
+from app.shared.HandleRequestValidation import handle_request_validation
+from app.routes.validations.errors.ValidationError import ValidationError
+
 auth = HTTPBasicAuth()
 
-create_user_schema = UserCreateInputSchema()
 @api.route('/api/users', methods=['POST'])
 def new_user():
     req_data = request.get_json()
-    errors = create_user_schema.validate(req_data)
-    error_list = []
-    for k, v in errors.items():
-        error_list.append({k: v})
-    if errors:
-        return (jsonify({'errors': error_list}), 400)
+    data_schema = UserCreateInputSchema()
+    try:
+        handle_request_validation(data_schema)
+    except ValidationError as err:
+        return jsonify(err.message), 400
 
     username = req_data['username']
     email = req_data['email']
@@ -96,9 +97,9 @@ def get_health():
 @api.route('/api/users/login')
 @auth.login_required
 def get_auth_token():
-    token = g.user.generate_auth_token(600)
+    token = g.user.generate_auth_token(current_app.config['TOKEN_TTL'])
 
-    response = flask.make_response({'token': token.decode('ascii'), 'duration': 600}, 200)
+    response = flask.make_response({'token': token.decode('ascii'), 'duration': current_app.config['TOKEN_TTL']}, 200)
     response.headers["Content-Type"] = "application/json"
     response.set_cookie('token', token.decode('ascii'), secure=False)
     return response

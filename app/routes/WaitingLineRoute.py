@@ -14,20 +14,19 @@ from datetime import datetime
 from app.shared.Util import format_datetime
 
 from app.shared.Authentication import is_logged, is_admin
+from app.shared.HandleRequestValidation import handle_request_validation
+from app.routes.validations.errors.ValidationError import ValidationError
 
 auth = HTTPBasicAuth()
 
-create_waiting_line_schema = WaitingLineCreateInputSchema()
 @api.route('/api/waiting-lines', methods=['POST'])
 def new_waiting_line():
     req_data = request.get_json()
-    errors = create_waiting_line_schema.validate(req_data)
-    error_list = []
-    for k, v in errors.items():
-        error_list.append({k: v})
-    if errors:
-        return (jsonify({'errors': error_list}), 400)
-
+    data_schema = WaitingLineCreateInputSchema()
+    try:
+        handle_request_validation(data_schema)
+    except ValidationError as err:
+        return jsonify(err.message), 400
 
     if not is_logged() or req_data['company_id'] != g.user.company_id or not is_admin():
         return (jsonify({'message': 'Not Authorized' })), 401

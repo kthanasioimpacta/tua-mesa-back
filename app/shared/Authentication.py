@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import flask
 from flask import request, g
 
 from flask_httpauth import HTTPBasicAuth

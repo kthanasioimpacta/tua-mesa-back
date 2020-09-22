@@ -4,7 +4,6 @@ from flask_httpauth import HTTPBasicAuth
 from flask import current_app
 import jwt
 import time
-from datetime import datetime
 
 auth = HTTPBasicAuth()
 

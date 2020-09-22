@@ -12,21 +12,21 @@ from app.routes.validations.LineUpCreateInputSchema import LineUpCreateInputSche
 
 from datetime import datetime
 from app.shared.Util import format_datetime
-
+from app.shared.HandleRequestValidation import handle_request_validation
 from app.shared.Authentication import is_logged, is_admin
+
+from app.routes.validations.errors.ValidationError import ValidationError
 
 auth = HTTPBasicAuth()
 
-create_line_up_schema = LineUpCreateInputSchema()
 @api.route('/api/line-ups', methods=['POST'])
 def new_line_up():
     req_data = request.get_json()
-    errors = create_line_up_schema.validate(req_data)
-    error_list = []
-    for k, v in errors.items():
-        error_list.append({k: v})
-    if errors:
-        return (jsonify({'errors': error_list}), 400)
+    data_schema = LineUpCreateInputSchema()
+    try:
+        handle_request_validation(data_schema)
+    except ValidationError as err:
+        return jsonify(err.message), 400
 
     line_up = LineUp(waiting_line_id= req_data['waiting_line_id'],
                      customer_id= req_data['customer_id'],

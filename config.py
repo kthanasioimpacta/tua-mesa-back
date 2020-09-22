@@ -14,12 +14,14 @@ class DevelopmentConfig(Config):
     """
     DEBUG = True
     SQLALCHEMY_ECHO = True    
+    TOKEN_TTL = 600
 
 class ProductionConfig(Config):
     """
     Production configurations
     """
     DEBUG = False
+    TOKEN_TTL = 86400
 
 app_config = {
     'development': DevelopmentConfig,

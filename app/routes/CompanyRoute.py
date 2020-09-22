@@ -1,32 +1,34 @@
 #!/usr/bin/env python
+
 import flask
 from flask import request, jsonify, g
 from app import db
 from sqlalchemy import and_
 from flask_httpauth import HTTPBasicAuth
 
-from werkzeug.security import generate_password_hash, check_password_hash
+# from werkzeug.security import generate_password_hash, check_password_hash
 from app.routes import api
 from app.models.Company import Company
 from app.routes.validations.CompanyCreateInputSchema import CompanyCreateInputSchema
 
 from datetime import datetime
 from app.shared.Util import format_datetime
-
+from app.shared.HandleRequestValidation import handle_request_validation
 from app.shared.Authentication import is_logged, is_admin
+
+from app.routes.validations.errors.ValidationError import ValidationError
 
 auth = HTTPBasicAuth()
 
-create_company_schema = CompanyCreateInputSchema()
 @api.route('/api/companies', methods=['POST'])
 def new_company():
     req_data = request.get_json()
-    errors = create_company_schema.validate(req_data)
-    error_list = []
-    for k, v in errors.items():
-        error_list.append({k: v})
-    if errors:
-        return (jsonify({'errors': error_list}), 400)
+    data_schema = CompanyCreateInputSchema()
+    try:
+        handle_request_validation(data_schema)
+    except ValidationError as err:
+        return jsonify(err.message), 400
+    
     name = req_data['name']
     if 'phone_region' not in req_data:
         phone_region = '+55'
