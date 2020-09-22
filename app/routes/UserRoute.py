@@ -87,6 +87,12 @@ def get_user(id):
     return response
 
 
+@api.route('/health')
+def get_health():
+    response = flask.make_response({'message': 'ok'}, 200)
+    response.headers["Content-Type"] = "application/json"
+    return response
+
 @api.route('/api/users/login')
 @auth.login_required
 def get_auth_token():

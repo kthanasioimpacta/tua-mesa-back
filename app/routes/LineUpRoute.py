@@ -33,11 +33,11 @@ def new_line_up():
                      status=0, # ENTROU NA FILA
                      joined_at=datetime.now())
 
-    if line_up.query.filter(and_(LineUp.customer_id==req_data['customer_id'],LineUp.status < 3)).first() is not None:
-        return (jsonify({'message': 'Customer already in an active Waiting Line'}), 400)
-
     if not is_logged(): # TODO: VALIDAR SE O USUÁRIO PERTENCE A EMPRESA
         return (jsonify({'message': 'Not Authorized' })), 401
+
+    if line_up.query.filter(and_(LineUp.customer_id==req_data['customer_id'],LineUp.status < 3)).first() is not None:
+        return (jsonify({'message': 'Customer already in an active Waiting Line'}), 400)
 
     db.session.add(line_up)
     db.session.commit()
@@ -54,8 +54,13 @@ def new_line_up():
 
 @api.route('/api/line-ups/next-customer', methods=['GET'])
 def get_next_customer():
+
+    if not is_logged(): # TODO: VALIDAR SE O USUÁRIO PERTENCE A EMPRESA
+        return (jsonify({'message': 'Not Authorized' })), 401
+
     waiting_line_id = request.args['waiting_line_id']
     line_up = LineUp()
+
     next_customer = line_up.query.filter(and_(LineUp.waiting_line_id==waiting_line_id,LineUp.status == 0)).order_by(db.asc('joined_at')).first()
     if not next_customer:
         return (jsonify({'message': 'Fila de espera vazia'}), 404)
@@ -71,6 +76,10 @@ def get_next_customer():
 
 @api.route('/api/line-ups/<int:id>/call-customer', methods=['PUT'])
 def call_customer(id):
+
+    if not is_logged(): # TODO: VALIDAR SE O USUÁRIO PERTENCE A EMPRESA
+        return (jsonify({'message': 'Not Authorized' })), 401
+
     line_up = LineUp.query.get(id)
     if not line_up:
         return (jsonify({'message': 'Record not found'}), 404)
