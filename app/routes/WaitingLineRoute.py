@@ -103,16 +103,6 @@ def get_waiting_line(id):
     return response
 
 
-# @api.route('/api/companies/login')
-# @auth.login_required
-# def get_auth_token():
-#     token = g.user.generate_auth_token(600)
-
-#     response = flask.make_response({'token': token.decode('ascii'), 'duration': 600}, 200)
-#     response.headers["Content-Type"] = "application/json"
-#     response.set_cookie('token', token.decode('ascii'), secure=False)
-#     return response
-
 @auth.verify_password
 def verify_password(pid, password='password'):
     # first try to authenticate by token
@@ -124,19 +114,3 @@ def verify_password(pid, password='password'):
             return False
     g.user = user
     return True
-
-# @api.route('/api/companies/currentuser')
-# def get_current_waiting_line():
-#     if not is_logged():
-#         return (jsonify({'message': 'Not Authorized' })), 401
-#     response = flask.make_response({ 'data': {
-#                                         'id': g.user.id,
-#                                         'username': g.user.username, 
-#                                         'email': g.user.email,
-#                                         'phone_region': g.user.phone_region,
-#                                         'phone_number': g.user.phone_number,
-#                                         'status': g.user.status}}, 200)
-#     return response
-
-# def is_logged():
-#     return verify_password(request.cookies.get('token'))

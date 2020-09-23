@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import flask
 from flask import request, jsonify, g, current_app
+from flask_cors import CORS
 from app import db
 from sqlalchemy import or_, and_
 from flask_httpauth import HTTPBasicAuth
@@ -12,11 +13,14 @@ from app.routes.validations.UserCreateInputSchema import UserCreateInputSchema
 
 from datetime import datetime
 from app.shared.Util import format_datetime
+from app.shared.Authentication import is_logged
 
 from app.shared.HandleRequestValidation import handle_request_validation
 from app.routes.validations.errors.ValidationError import ValidationError
 
 auth = HTTPBasicAuth()
+
+CORS(app)
 
 @api.route('/api/users', methods=['POST'])
 def new_user():
@@ -132,6 +136,3 @@ def get_current_user():
                                         'created_at': format_datetime(g.user.created_at),
                                         'updated_at': format_datetime(g.user.updated_at)}}, 200)
     return response
-
-def is_logged():
-    return verify_password(request.cookies.get('token'))
