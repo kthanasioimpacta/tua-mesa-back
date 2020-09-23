@@ -10,6 +10,7 @@ from app.routes import api
 from app.models.User import User
 from app.routes.validations.UserCreateInputSchema import UserCreateInputSchema
 
+import time
 from datetime import datetime
 from app.shared.Util import format_datetime
 from app.shared.Authentication import is_logged
@@ -102,7 +103,12 @@ def get_auth_token():
 
     response = flask.make_response({'token': token.decode('ascii'), 'duration': current_app.config['TOKEN_TTL']}, 200)
     response.headers["Content-Type"] = "application/json"
-    response.set_cookie('token', token.decode('ascii'), secure=False, domain='.tuamesa.com.br')
+    
+    lease = 14 * 24 * 60 * 60  # 14 days in seconds
+    end = time.gmtime(time.time() + lease)
+    expires = time.strftime("%a, %d-%b-%Y %T GMT", end)
+
+    response.set_cookie('token', token.decode('ascii'), secure=False, domain='.tuamesa.com.br', expires=expires)
     return response
 
 @auth.verify_password
