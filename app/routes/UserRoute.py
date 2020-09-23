@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import flask
 from flask import request, jsonify, g, current_app
-from flask_cors import CORS
 from app import db
 from sqlalchemy import or_, and_
 from flask_httpauth import HTTPBasicAuth
@@ -97,7 +96,6 @@ def get_health():
     return response
 
 @api.route('/api/users/login')
-@cross_origin()
 @auth.login_required
 def get_auth_token():
     token = g.user.generate_auth_token(current_app.config['TOKEN_TTL'])
