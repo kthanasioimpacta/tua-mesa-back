@@ -20,8 +20,6 @@ from app.routes.validations.errors.ValidationError import ValidationError
 
 auth = HTTPBasicAuth()
 
-CORS(app)
-
 @api.route('/api/users', methods=['POST'])
 def new_user():
     req_data = request.get_json()
