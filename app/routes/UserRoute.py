@@ -102,7 +102,7 @@ def get_auth_token():
 
     response = flask.make_response({'token': token.decode('ascii'), 'duration': current_app.config['TOKEN_TTL']}, 200)
     response.headers["Content-Type"] = "application/json"
-    response.set_cookie('token', token.decode('ascii'), secure=False, domain='localhost')
+    response.set_cookie('token', token.decode('ascii'), secure=False, domain='.tuamesa.com.br')
     return response
 
 @auth.verify_password
