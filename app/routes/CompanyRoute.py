@@ -74,6 +74,7 @@ def get_company(id):
                                         'name': company.name, 
                                         'phone_region': company.phone_region,
                                         'phone_number': company.phone_number,
+                                        'admin_email': company.admin_email,
                                         'status': company.status,
                                         'created_at': format_datetime(company.created_at),
                                         'updated_at': format_datetime(company.updated_at)}}), 200)

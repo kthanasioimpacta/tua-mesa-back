@@ -6,6 +6,7 @@ class Company(db.Model):
     name = db.Column(db.String(100), index=True)
     phone_region = db.Column(db.String(5), index=False, nullable=False)
     phone_number = db.Column(db.String(100), index=False, nullable=False)
+    admin_email = db.Column(db.String(100), index=False, nullable=True)
     status = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
     updated_at = db.Column(db.DateTime, nullable=False)
@@ -14,6 +15,7 @@ class Company(db.Model):
     company_configs = db.relationship('CompanyConfig', backref='company', lazy=True)
 
     __table_args__ = (db.UniqueConstraint('phone_region', 'phone_number', name='_company_uc'),
+                      db.UniqueConstraint('admin_email', name='_admin_email_uc')
                      )
 
 

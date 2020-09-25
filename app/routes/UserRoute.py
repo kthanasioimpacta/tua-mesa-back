@@ -8,6 +8,7 @@ from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.routes import api
 from app.models.User import User
+from app.models.Company import Company
 from app.routes.validations.UserCreateInputSchema import UserCreateInputSchema
 
 import time
@@ -35,6 +36,10 @@ def new_user():
         phone_region = '+55'
     else:
         phone_region = req_data['phone_region']
+
+    if User.query.filter(or_(User.email==email,User.username==username)).first() is not None:
+        return (jsonify({'message': 'User already exists'}), 400)
+
     user = User(username=username, 
                 email=email, 
                 company_id=req_data['company_id'], 
@@ -45,13 +50,17 @@ def new_user():
                 created_at=datetime.now(),
                 updated_at=datetime.now())
 
-    if User.query.filter(or_(User.email==email,User.username==username)).first() is not None:
-        return (jsonify({'message': 'User already exists'}), 400)
-
     user.hash_password(req_data['password'])
+    if req_data['role_id'] == 1: # ADMIN
+        company = Company.query.get(req_data['company_id'])
+        company.admin_email = req_data['email']
+        db.session.add(company)
+
     db.session.add(user)
     db.session.commit()
 
+    verify_password(user.username, req_data['password'])
+    token = g.user.generate_auth_token(current_app.config['TOKEN_TTL'])
     response = flask.make_response(jsonify({ 'data': {
                                         'id': user.id,
                                         'username': user.username, 
@@ -64,8 +73,14 @@ def new_user():
                                         'created_at': format_datetime(user.created_at),
                                         'updated_at': format_datetime(user.updated_at)}}), 201)
     response.headers["Content-Type"] = "application/json"
+    setCookie(response,token)
     return response
 
+def setCookie(response,token):
+    lease = 14 * 24 * 60 * 60  # 14 days in seconds
+    end = time.gmtime(time.time() + lease)
+    expires = time.strftime("%a, %d-%b-%Y %T GMT", end)
+    response.set_cookie('token', token.decode('ascii'), secure=False, domain='.tuamesa.com.br', expires=expires)
 
 @api.route('/api/users/<int:id>', methods=['GET'])
 def get_user(id):
@@ -100,20 +115,27 @@ def get_health():
 @auth.login_required
 def get_auth_token():
     req_data = request.get_json()
-    
-    if req_data['email'] != g.user.email:
+    company = Company.query.get(g.user.company_id)
+
+    if req_data['email'] != company.admin_email:
         return (jsonify({'message': 'Not Authorized' })), 401
 
     token = g.user.generate_auth_token(current_app.config['TOKEN_TTL'])
 
-    response = flask.make_response({'token': token.decode('ascii'), 'duration': current_app.config['TOKEN_TTL']}, 200)
+    response = flask.make_response(jsonify({ 'data': {
+                                        'id': g.user.id,
+                                        'username': g.user.username, 
+                                        'company_id': g.user.company_id,
+                                        'email': g.user.email,
+                                        'phone_region': g.user.phone_region,
+                                        'phone_number': g.user.phone_number,
+                                        'status': g.user.status,
+                                        'role_id': g.user.role_id,
+                                        'created_at': format_datetime(g.user.created_at),
+                                        'updated_at': format_datetime(g.user.updated_at)}}), 200)
     response.headers["Content-Type"] = "application/json"
     
-    lease = 14 * 24 * 60 * 60  # 14 days in seconds
-    end = time.gmtime(time.time() + lease)
-    expires = time.strftime("%a, %d-%b-%Y %T GMT", end)
-
-    response.set_cookie('token', token.decode('ascii'), secure=False, domain='.tuamesa.com.br', expires=expires)
+    setCookie(response,token)
     return response
 
 @auth.verify_password
