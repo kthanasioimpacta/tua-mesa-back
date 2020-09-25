@@ -96,9 +96,14 @@ def get_health():
     response.headers["Content-Type"] = "application/json"
     return response
 
-@api.route('/api/users/login')
+@api.route('/api/users/login', methods=['POST'])
 @auth.login_required
 def get_auth_token():
+    req_data = request.get_json()
+    
+    if req_data['email'] != g.user.email:
+        return (jsonify({'message': 'Not Authorized' })), 401
+
     token = g.user.generate_auth_token(current_app.config['TOKEN_TTL'])
 
     response = flask.make_response({'token': token.decode('ascii'), 'duration': current_app.config['TOKEN_TTL']}, 200)
