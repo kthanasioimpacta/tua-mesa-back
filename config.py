@@ -15,6 +15,8 @@ class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_ECHO = True    
     TOKEN_TTL = 600
+    TWILIO_ACCOUNT_SID = 'AC483808afaac154ec873a226270053661'
+    TWILIO_AUTH_TOKEN = 'aed5229a82745d9fcc9c33a94d31da70'
 
 class ProductionConfig(Config):
     """
