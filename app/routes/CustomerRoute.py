@@ -17,24 +17,19 @@ auth = HTTPBasicAuth()
 
 @api.route('/api/customers', methods=['POST'])
 def new_customer():
-    req_data = request.get_json()
     data_schema = CustomerCreateInputSchema()
     try:
         handle_request_validation(data_schema)
     except ValidationError as err:
         return jsonify(err.message), 400
-
     if not is_logged():
         return (jsonify({'message': 'Not Authorized' })), 401
-
-    return CustomerService.save(req_data)
+    return CustomerService.save(request.get_json())
 
 
 @api.route('/api/customers/<int:id>', methods=['GET'])
 def get_customer(id):
-
     if not is_logged():
         return (jsonify({'message': 'Not Authorized' })), 401
-
     return CustomerService.get(id)
 

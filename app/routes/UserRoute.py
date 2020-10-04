@@ -21,7 +21,6 @@ def new_user():
         handle_request_validation(data_schema)
     except ValidationError as err:
         return jsonify(err.message), 400
-
     return UserService.save(request.get_json())
 
 @api.route('/api/users/<int:id>', methods=['GET'])
