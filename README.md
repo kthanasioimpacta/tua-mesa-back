@@ -57,3 +57,8 @@ For the configuration above, the variable [SQLALCHEMY_DATABASE_URI] in the file 
 - Install POSTMAN application and import this collection:
 
 <code>https://www.getpostman.com/collections/42dba093768b05a82edf</code>
+
+
+## Docker
+
+- run docker-compose up -d
