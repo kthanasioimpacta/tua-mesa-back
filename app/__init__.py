@@ -6,7 +6,7 @@ from flask_httpauth import HTTPBasicAuth
 from config import app_config
 
 db = SQLAlchemy()
-from app.routes import (api as api_blueprint, UserRoute, CompanyRoute, WaitingLineRoute, CustomerRoute)
+from app.routes import (api as api_blueprint, UserRoute, CompanyRoute, WaitingLineRoute, CustomerRoute, LineUpRoute)
 
 # IMPORTING YOUR MODELS
 from app.models import (User, Company, Customer, WaitingLine, LineUp, Config, CompanyConfig)

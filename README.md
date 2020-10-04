@@ -34,6 +34,8 @@ For the configuration above, the variable [SQLALCHEMY_DATABASE_URI] in the file 
 
 
 ### If you're using a new database (Create your tables as follows)
+- export FLASK_APP=run.py  
+- export FLASK_ENV=development  
 - flask db stamp base  
 - flask db upgrade  
 

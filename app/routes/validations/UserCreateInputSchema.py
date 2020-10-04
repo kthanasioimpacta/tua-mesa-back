@@ -1,6 +1,5 @@
-from marshmallow import Schema, fields, validates, ValidationError, validate
-from marshmallow.validate import Length, Range
-import re
+from marshmallow import Schema, fields, validates, ValidationError
+from marshmallow.validate import Length
 
 class UserCreateInputSchema(Schema):
     """ /api/users - POST
