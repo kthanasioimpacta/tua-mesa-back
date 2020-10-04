@@ -8,8 +8,8 @@ class LineUp(db.Model):
     joined_at = db.Column(db.DateTime, nullable=False)
     first_call_at = db.Column(db.DateTime, nullable=True)
     second_call_at = db.Column(db.DateTime, nullable=True)
-    completed_call_at = db.Column(db.DateTime, nullable=True)
-    cancelled_call_at = db.Column(db.DateTime, nullable=True)
+    completed_at = db.Column(db.DateTime, nullable=True)
+    cancelled_at = db.Column(db.DateTime, nullable=True)
     status = db.Column(db.Integer, nullable=False)
     
 

@@ -63,7 +63,7 @@ def call_customer(id):
           line_up.second_call_at = datetime.now()
           line_up.status = 2 # second call
       else:
-          line_up.cancelled_call_at = datetime.now()
+          line_up.cancelled_at = datetime.now()
           line_up.status = 4 # cancelled
           db.session.add(line_up)
           db.session.commit()
@@ -79,8 +79,8 @@ def call_customer(id):
                                       'joined_at': format_datetime(line_up.joined_at),
                                       'first_call_at': format_datetime(line_up.first_call_at),
                                       'second_call_at': format_datetime(line_up.second_call_at),
-                                      'completed_call_at': format_datetime(line_up.completed_call_at),
-                                      'cancelled_call_at': format_datetime(line_up.cancelled_call_at),
+                                      'completed_at': format_datetime(line_up.completed_at),
+                                      'cancelled_at': format_datetime(line_up.cancelled_at),
                                       'status': line_up.status}}), 200)
   response.headers["Content-Type"] = "application/json"
   return response
