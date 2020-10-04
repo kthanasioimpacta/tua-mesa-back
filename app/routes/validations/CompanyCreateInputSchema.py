@@ -11,4 +11,5 @@ class CompanyCreateInputSchema(Schema):
      
     """
     name = fields.Str(required=True, validate=Length(max=32))
+    phone_region = fields.Str(required=False)
     phone_number = fields.Str(required=True)
