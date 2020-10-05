@@ -1,5 +1,7 @@
 # TUA MESA - BACKEND PROJECT
 
+[![Build Status](https://travis-ci.com/kthanasioimpacta/tua-mesa-back.svg?branch=master)](https://travis-ci.com/kthanasioimpacta/tua-mesa-back)
+
 ## REQUIREMENTS 
 
 - python3.7 or superior
