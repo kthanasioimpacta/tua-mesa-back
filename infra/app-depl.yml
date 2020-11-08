@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tua-mesa-back
+spec:
+  selector:
+    matchLabels:
+      app: tua-mesa-back
+  template:
+    metadata:
+      labels:
+        app: tua-mesa-back
+    spec:
+      containers:
+      - name: tua-mesa-back
+        image: kthanasio/tua-mesa-back
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 5000

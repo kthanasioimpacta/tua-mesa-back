@@ -6,10 +6,8 @@ class WaitingLineCreateInputSchema(Schema):
 
     Parameters:
      - name: (str)
-     - company_id:  (int) 
      - is_priority:  (boolean) 
      
     """
     name = fields.Str(required=True, validate=Length(max=100))
-    company_id = fields.Int(required=True)
     is_priority = fields.Bool(required=True)

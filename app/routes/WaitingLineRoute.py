@@ -24,7 +24,7 @@ def new_waiting_line():
     except ValidationError as err:
         return jsonify(err.message), 400
 
-    if not is_logged() or req_data['company_id'] != g.user.company_id or not is_admin():
+    if not is_logged() or not is_admin():
         return (jsonify({'message': 'Not Authorized' })), 401
         
     return WaitingLineService.save(req_data)

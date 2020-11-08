@@ -11,13 +11,13 @@ from app.shared.Util import format_datetime
 def save(data):
   name = data['name']
   waiting_line = WaitingLine(name=name,
-              company_id=data['company_id'],
+              company_id=g.user.company_id,
               status=1, # ATIVO
               is_priority=data['is_priority'],
               created_at=datetime.now(),
               updated_at=datetime.now())
 
-  if waiting_line.query.filter(and_(WaitingLine.company_id==data['company_id'],WaitingLine.name==name)).first() is not None:
+  if waiting_line.query.filter(and_(WaitingLine.company_id==g.user.company_id,WaitingLine.name==name)).first() is not None:
       return (jsonify({'message': 'Company already exists'}), 400)
 
   db.session.add(waiting_line)
@@ -37,7 +37,7 @@ def save(data):
 def getAll():
   waiting_lines = WaitingLine.query.filter_by(company_id=g.user.company_id).all()
   if not waiting_lines:
-      return (jsonify({'message': 'No Waiting Lines found'}), 404)
+      return (jsonify({'message': 'No Waiting Lines found'}), 200)
   resp = {'data': []} 
   for waiting_line in waiting_lines:
       resp['data'].append( {  'id': waiting_line.id,
