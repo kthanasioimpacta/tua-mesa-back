@@ -25,6 +25,10 @@ def new_line_up():
 
     return LineUpService.save(request.get_json())
 
+@api.route('/api/line-ups/<int:id>', methods=['GET'])
+def list_line_up(id):
+    return LineUpService.getAll(id)
+
 
 @api.route('/api/line-ups/next-customer', methods=['GET'])
 def get_next_customer():

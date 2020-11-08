@@ -50,6 +50,23 @@ def get_next_customer(waiting_line_id):
   response.headers["Content-Type"] = "application/json"
   return response
 
+def getAll(waiting_line_id):
+  LineUps = LineUp.query.filter_by(id=waiting_line_id).all()
+  if not LineUps:
+      return (jsonify({'message': 'No Customers found'}), 200)
+  resp = {'data': []} 
+  for line_up in LineUps:
+      resp['data'].append( {  'id': line_up.id,
+                              'customer_id': line_up.customer_id,
+                              'waiting_line_id': line_up.waiting_line_id, 
+                              'status': line_up.status,
+                              'created_at': format_datetime(line_up.created_at),
+                              'updated_at': format_datetime(line_up.updated_at)})
+  response = flask.make_response(jsonify(resp), 200)
+  
+  response.headers["Content-Type"] = "application/json"
+  return response
+
 def call_customer(id):
   line_up = LineUp.query.get(id)
   if not line_up:
