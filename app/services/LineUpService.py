@@ -50,8 +50,8 @@ def get_next_customer(waiting_line_id):
   response.headers["Content-Type"] = "application/json"
   return response
 
-def getAll(waiting_line_id):
-  LineUps = LineUp.query.filter_by(id=waiting_line_id).all()
+def getAll(line_id):
+  LineUps = LineUp.query.filter_by(waiting_line_id=line_id).all()
   if not LineUps:
       return (jsonify({'message': 'No Customers found'}), 200)
   resp = {'data': []} 
