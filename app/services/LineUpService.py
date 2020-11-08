@@ -8,6 +8,7 @@ from app.shared.Util import format_datetime
 from app.shared.Authentication import is_logged, is_admin
 
 from app.models.LineUp import LineUp
+from app.models.Customer import Customer
 
 def save(data):
   line_up = LineUp(waiting_line_id= data['waiting_line_id'],
@@ -51,17 +52,24 @@ def get_next_customer(waiting_line_id):
   return response
 
 def getAll(line_id):
-  LineUps = LineUp.query.filter_by(waiting_line_id=line_id).all()
+  LineUps = LineUp.query.filter_by(waiting_line_id=line_id).order_by(db.asc('joined_at')).all()
   if not LineUps:
       return (jsonify({'message': 'No Customers found'}), 200)
   resp = {'data': []} 
   for line_up in LineUps:
+      customer = Customer()
+      customer_data = customer.query.filter_by(id=line_up.customer_id).first()
       resp['data'].append( {  'id': line_up.id,
                               'customer_id': line_up.customer_id,
+                              'customer_name': customer_data.name,
+                              'customer_phone_number': customer_data.phone_number,
                               'waiting_line_id': line_up.waiting_line_id, 
                               'status': line_up.status,
-                              'created_at': format_datetime(line_up.created_at),
-                              'updated_at': format_datetime(line_up.updated_at)})
+                              'joined_at': format_datetime(line_up.joined_at),
+                              'first_call_at': format_datetime(line_up.first_call_at),
+                              'second_call_at': format_datetime(line_up.second_call_at),
+                              'cancelled_at': format_datetime(line_up.cancelled_at),
+                              'completed_at': format_datetime(line_up.completed_at)})
   response = flask.make_response(jsonify(resp), 200)
   
   response.headers["Content-Type"] = "application/json"
