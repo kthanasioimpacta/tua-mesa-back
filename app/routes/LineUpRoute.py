@@ -25,9 +25,12 @@ def new_line_up():
 
     return LineUpService.save(request.get_json())
 
-@api.route('/api/line-ups/<int:id>', methods=['GET'])
-def list_line_up(id):
-    return LineUpService.getAll(id)
+@api.route('/api/line-ups', methods=['GET'])
+def list_line_up():
+    if not is_logged(): # TODO: VALIDAR SE O USUÁRIO PERTENCE A EMPRESA
+        return (jsonify({'message': 'Not Authorized' })), 401
+    waiting_line_id = request.args['waiting_line_id']
+    return LineUpService.getAll(waiting_line_id)
 
 
 @api.route('/api/line-ups/next-customer', methods=['GET'])

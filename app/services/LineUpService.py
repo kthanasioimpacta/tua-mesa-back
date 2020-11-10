@@ -1,7 +1,7 @@
 import flask
 from flask import jsonify, request
 from app import db
-from sqlalchemy import and_
+from sqlalchemy import and_, func
 from datetime import datetime
 from app.shared.Util import format_datetime
 
@@ -52,11 +52,17 @@ def get_next_customer(waiting_line_id):
   return response
 
 def getAll(line_id):
-  LineUps = LineUp.query.filter_by(waiting_line_id=line_id).order_by(db.asc('joined_at')).all()
+  line_up = LineUp()
+  LineUps = line_up.query.filter(and_(LineUp.waiting_line_id==line_id,LineUp.status < 3)).order_by(db.asc('joined_at')).all()
+  total = line_up.query.filter(and_(LineUp.waiting_line_id==line_id,LineUp.status < 3)).count()
+  
   if not LineUps:
       return (jsonify({'message': 'No Customers found'}), 200)
-  resp = {'data': []} 
+  resp = {'data': [],'summary': {}} 
+  lowest = None
   for line_up in LineUps:
+      if (lowest is None):
+        lowest = round(((datetime.now() - line_up.joined_at).total_seconds())/60)
       customer = Customer()
       customer_data = customer.query.filter_by(id=line_up.customer_id).first()
       resp['data'].append( {  'id': line_up.id,
@@ -70,6 +76,7 @@ def getAll(line_id):
                               'second_call_at': format_datetime(line_up.second_call_at),
                               'cancelled_at': format_datetime(line_up.cancelled_at),
                               'completed_at': format_datetime(line_up.completed_at)})
+  resp['summary'] = {'qty_total': total, 'max_waiting_minutes': lowest}
   response = flask.make_response(jsonify(resp), 200)
   
   response.headers["Content-Type"] = "application/json"
