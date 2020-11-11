@@ -39,8 +39,10 @@ def save(data):
   db.session.commit()
   token = jwt.encode(
             { 'waiting_line_id': line_up.waiting_line_id, 'line_up_id': line_up.id},
-            current_app.config['SECRET_KEY'], algorithm='HS256')
-  body = 'Acompanhe a sua posição na fila de espera: http://www.tuamesa.com.br:8080/api/waiting-lines/position?token=' + str(token)
+            current_app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
+  print(token)
+  print(str(token))
+  body = 'Acompanhe a sua posição na fila de espera: http://www.tuamesa.com.br:8080/api/waiting-lines/position?token={}'.format(str(token))
   SendSms(line_up.customer_id, body)
   response = flask.make_response(jsonify({ 'data': {
                                       'id': line_up.id,

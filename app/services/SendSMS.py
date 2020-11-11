@@ -8,7 +8,7 @@ from twilio.rest import Client
 # auth_token = current_app.config['TWILIO_AUTH_TOKEN']
 
 TWILIO_ACCOUNT_SID = 'AC483808afaac154ec873a226270053661'
-TWILIO_AUTH_TOKEN = '927ca398f02fd79aaa98dbd5dee35890'
+TWILIO_AUTH_TOKEN = 'bf40deff0fcc9bc8f03dc0019f4d02d7'
 
 def SendSMS(customer_phone_number, body):
     client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
