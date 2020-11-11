@@ -1,16 +1,29 @@
+import re
 import flask
+import jwt
 from flask import jsonify, request
 from app import db
+from flask import current_app
 from sqlalchemy import and_, func
 from datetime import datetime
 from app.shared.Util import format_datetime
+from app.services.SendSMS import SendSMS
 
 from app.shared.Authentication import is_logged, is_admin
 
 from app.models.LineUp import LineUp
 from app.models.Customer import Customer
 
+def SendSms(customer_id, message):
+  customer = Customer()
+  cust = customer.query.filter(and_(Customer.id==customer_id)).first()
+  phone_number = cust.phone_number + cust.phone_number
+  phone_number = re.compile(r'^[-+]?([1-9]\d*|0)$')
+  body = f'{cust.name} - ' + message
+  SendSMS(phone_number, body)
+
 def save(data):
+  customer = Customer()
   line_up = LineUp(waiting_line_id= data['waiting_line_id'],
                      customer_id= data['customer_id'],
                      status=0, # ENTROU NA FILA
@@ -24,7 +37,11 @@ def save(data):
 
   db.session.add(line_up)
   db.session.commit()
-
+  token = jwt.encode(
+            { 'waiting_line_id': line_up.waiting_line_id, 'line_up_id': line_up.id},
+            current_app.config['SECRET_KEY'], algorithm='HS256')
+  body = 'Acompanhe a sua posição na fila de espera: http://www.tuamesa.com.br:8080/api/waiting-lines/position?token=' + str(token)
+  SendSms(line_up.customer_id, body)
   response = flask.make_response(jsonify({ 'data': {
                                       'id': line_up.id,
                                       'customer_id': line_up.customer_id,
@@ -114,5 +131,7 @@ def call_customer(id):
                                       'completed_at': format_datetime(line_up.completed_at),
                                       'cancelled_at': format_datetime(line_up.cancelled_at),
                                       'status': line_up.status}}), 200)
+  body = 'Sua mesa está disponível!'
+  SendSms(line_up.customer_id, body)
   response.headers["Content-Type"] = "application/json"
   return response

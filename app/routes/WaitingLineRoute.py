@@ -36,3 +36,7 @@ def get_waiting_lines():
         return (jsonify({'message': 'Not Authorized' })), 401
 
     return WaitingLineService.getAll()
+
+@api.route('/api/waiting-lines/position', methods=['GET'])
+def get_position():
+    return WaitingLineService.getPosition(request.args['token'])

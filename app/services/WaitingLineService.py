@@ -1,5 +1,6 @@
 import flask
-from flask import jsonify, g
+import jwt
+from flask import jsonify, g, current_app
 from app.models.WaitingLine import WaitingLine
 
 from app import db
@@ -9,6 +10,8 @@ from datetime import datetime
 from app.shared.Util import format_datetime
 
 from app.models.LineUp import LineUp
+from app.models.Company import Company
+# from app.models.Customer import Customer
 
 def save(data):
   name = data['name']
@@ -57,6 +60,34 @@ def getAll():
                               'qty_total': total,
                               'max_waiting_minutes': lowest}
                               )
+  response = flask.make_response(jsonify(resp), 200)
+  
+  response.headers["Content-Type"] = "application/json"
+  return response
+
+def getPosition(token):
+  data = jwt.decode(token, current_app.config['SECRET_KEY'],
+                  algorithms=['HS256'])
+  print(data)
+  waiting_line_id = data.waiting_line_id
+  line_up_id = data.line_up_id
+
+  resp = {'data': [],'summary': {}} 
+  line_up = LineUp()
+  posicao = line_up.query.filter(and_(LineUp.waiting_line_id==waiting_line_id,LineUp.status < 3,LineUp.id < line_up_id)).count()
+  waiting_line = WaitingLine()
+  waiting_line = waiting_line.query.filter(and_(WaitingLine.id == waiting_line_id)).all()
+  company = Company()
+  company = Company.query.filter(and_(Company.id == waiting_line.company_id)).all()
+
+
+  resp['data'].append( {  'position': posicao,
+                          'company_name': company.name,
+                          'waiting_line_name': waiting_line.name,
+                          'status': line_up.status,
+                          'joined_at': format_datetime(line_up.joined_at)
+                          }
+                          )
   response = flask.make_response(jsonify(resp), 200)
   
   response.headers["Content-Type"] = "application/json"
