@@ -48,8 +48,8 @@ def getAll():
   for waiting_line in waiting_lines:
       line_up = LineUp()
       total = line_up.query.filter(and_(LineUp.waiting_line_id==waiting_line.id,LineUp.status < 3)).count()
-      # if (lowest is None):
-      #   lowest = round(((datetime.now() - line_up.joined_at).total_seconds())/60)
+      line = line_up.query.filter(and_(LineUp.waiting_line_id==waiting_line.id,LineUp.status < 3)).order_by(db.asc('joined_at')).first()
+      lowest = round(((datetime.now() - line.joined_at).total_seconds())/60)
       resp['data'].append( {  'id': waiting_line.id,
                               'company_id': waiting_line.company_id,
                               'name': waiting_line.name, 
