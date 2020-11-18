@@ -20,5 +20,5 @@ def create_app(config_name):
     app.config.from_pyfile('config.py')
     db.init_app(app)
     migrate = Migrate(app, db, compare_type=True)
-    
+
     return app

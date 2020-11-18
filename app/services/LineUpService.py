@@ -18,9 +18,9 @@ def SendSms(customer_id, message):
   customer = Customer()
   cust = customer.query.filter(and_(Customer.id==customer_id)).first()
   phone_number = cust.phone_region + cust.phone_number
-  phone_number = re.compile(r'^[-+]?([1-9]\d*|0)$')
+  phone_number = re.sub('[^0-9^+]','',phone_number)
   body = f'{cust.name} - ' + message
-  SendSMS(phone_number, body)
+  SendSMS(phone_number, body, current_app.config['TWILIO_AUTH_TOKEN'])
 
 def save(data):
   customer = Customer()
