@@ -76,7 +76,7 @@ def getPosition(token):
   
   resp = {'data': [],'summary': {}} 
   line_up = LineUp()
-  posicao = line_up.query.filter(and_(LineUp.waiting_line_id==waiting_line_id,LineUp.status < 3,LineUp.id < line_up_id)).count()
+  posicao = line_up.query.filter(and_(LineUp.waiting_line_id==waiting_line_id,LineUp.status < 3,LineUp.id <= line_up_id)).count()
   
   waiting_line = WaitingLine()
   waiting = waiting_line.query.filter(and_(WaitingLine.id == waiting_line_id)).first()
