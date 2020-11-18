@@ -17,7 +17,7 @@ from app.models.Customer import Customer
 def SendSms(customer_id, message):
   customer = Customer()
   cust = customer.query.filter(and_(Customer.id==customer_id)).first()
-  phone_number = cust.phone_number + cust.phone_number
+  phone_number = cust.phone_region + cust.phone_number
   phone_number = re.compile(r'^[-+]?([1-9]\d*|0)$')
   body = f'{cust.name} - ' + message
   SendSMS(phone_number, body)

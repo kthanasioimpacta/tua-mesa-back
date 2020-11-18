@@ -14,7 +14,7 @@ def SendSMS(customer_phone_number, body):
     client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
     message = client.api.account.messages.create(
-        to="+5511981677677",
+        to=customer_phone_number,
         from_="+12087470336",
         body=body)
 
