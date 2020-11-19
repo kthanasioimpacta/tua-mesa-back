@@ -57,7 +57,7 @@ def get_next_customer(waiting_line_id):
   
   line_up = LineUp()
 
-  next_customer = line_up.query.filter(and_(LineUp.waiting_line_id==waiting_line_id,LineUp.status == 0)).order_by(db.asc('joined_at')).first()
+  next_customer = line_up.query.filter(and_(LineUp.waiting_line_id==waiting_line_id,LineUp.status < 3)).order_by(db.asc('joined_at')).first()
   if not next_customer:
       return (jsonify({'message': 'Fila de espera vazia'}), 404)
 
