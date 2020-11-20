@@ -37,6 +37,14 @@ def get_waiting_lines():
 
     return WaitingLineService.getAll()
 
+@api.route('/api/waiting-lines/<int:id>', methods=['GET'])
+def get_waiting_line(id):
+    if not is_logged():
+        return (jsonify({'message': 'Not Authorized' })), 401
+
+    return WaitingLineService.get(id)
+
+
 @api.route('/api/waiting-lines/position', methods=['GET'])
 def get_position():
     return WaitingLineService.getPosition(request.args['token'])

@@ -66,6 +66,34 @@ def getAll():
   response.headers["Content-Type"] = "application/json"
   return response
 
+
+def get(id):
+  waiting_line = WaitingLine.query.filter(and_(WaitingLine.id==id,WaitingLine.company_id==g.user.company_id)).first()
+  if not waiting_line:
+      return (jsonify({'message': 'No Waiting Line found'}), 200)
+  resp = {'data': [],'summary': {}} 
+  
+  lowest = None
+  line_up = LineUp()
+  total = line_up.query.filter(and_(LineUp.waiting_line_id==waiting_line.id,LineUp.status < 3)).count()
+  line = line_up.query.filter(and_(LineUp.waiting_line_id==waiting_line.id,LineUp.status < 3)).order_by(db.asc('joined_at')).first()
+  if (line):
+    lowest = round(((datetime.now() - line.joined_at).total_seconds())/60)
+  resp['data'].append( {  'id': waiting_line.id,
+                          'company_id': waiting_line.company_id,
+                          'name': waiting_line.name, 
+                          'is_priority': waiting_line.is_priority,
+                          'status': waiting_line.status,
+                          'created_at': format_datetime(waiting_line.created_at),
+                          'updated_at': format_datetime(waiting_line.updated_at),
+                          'qty_total': total,
+                          'max_waiting_minutes': lowest}
+                          )
+  response = flask.make_response(jsonify(resp), 200)
+  
+  response.headers["Content-Type"] = "application/json"
+  return response
+
 def getPosition(token):
   data = jwt.decode(token, current_app.config['SECRET_KEY'],
                   algorithms=['HS256'])
