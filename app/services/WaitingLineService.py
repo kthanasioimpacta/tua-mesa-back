@@ -14,11 +14,17 @@ from app.models.Company import Company
 # from app.models.Customer import Customer
 
 def save(data):
+  priority = 0
   name = data['name']
+  priority = data['is_priority']
+  print('Prioridade : ' + priority)
+  if (priority == "true" or priority==1 or priority):
+    priority = 1
+
   waiting_line = WaitingLine(name=name,
               company_id=g.user.company_id,
               status=1, # ATIVO
-              is_priority=data['is_priority'],
+              is_priority=priority,
               created_at=datetime.now(),
               updated_at=datetime.now())
 
