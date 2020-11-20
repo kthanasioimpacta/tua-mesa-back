@@ -14,13 +14,9 @@ from app.models.Company import Company
 # from app.models.Customer import Customer
 
 def save(data):
-  priority = 0
   name = data['name']
-  priority = data['is_priority'].lower()
-  print(priority)
-  # if (priority == "true" or priority==1 or priority):
-  #   priority = 1
-
+  priority = data['is_priority']
+  
   waiting_line = WaitingLine(name=name,
               company_id=g.user.company_id,
               status=1, # ATIVO
@@ -29,7 +25,7 @@ def save(data):
               updated_at=datetime.now())
 
   if waiting_line.query.filter(and_(WaitingLine.company_id==g.user.company_id,WaitingLine.name==name)).first() is not None:
-      return (jsonify({'message': 'Company already exists'}), 400)
+      return (jsonify({'message': 'WaitingLine already exists'}), 400)
 
   db.session.add(waiting_line)
   db.session.commit()
