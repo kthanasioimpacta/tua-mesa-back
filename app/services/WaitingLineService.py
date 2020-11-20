@@ -17,7 +17,7 @@ def save(data):
   priority = 0
   name = data['name']
   priority = data['is_priority']
-  print('Prioridade : ' + priority)
+  print(priority)
   if (priority == "true" or priority==1 or priority):
     priority = 1
 
