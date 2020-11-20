@@ -16,10 +16,10 @@ from app.models.Company import Company
 def save(data):
   priority = 0
   name = data['name']
-  priority = data['is_priority']
+  priority = data['is_priority'].lower()
   print(priority)
-  if (priority == "true" or priority==1 or priority):
-    priority = 1
+  # if (priority == "true" or priority==1 or priority):
+  #   priority = 1
 
   waiting_line = WaitingLine(name=name,
               company_id=g.user.company_id,
