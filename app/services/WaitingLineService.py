@@ -42,7 +42,7 @@ def save(data):
   return response
 
 def getAll():
-  waiting_lines = WaitingLine.query.filter_by(company_id=g.user.company_id).all()
+  waiting_lines = WaitingLine.query.filter_by(company_id=g.user.company_id).order_by(db.asc('name')).all()
   if not waiting_lines:
       return (jsonify({'message': 'No Waiting Lines found'}), 200)
   resp = {'data': [],'summary': {}} 
