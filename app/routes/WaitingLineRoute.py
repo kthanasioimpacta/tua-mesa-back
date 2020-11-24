@@ -44,6 +44,13 @@ def get_waiting_line(id):
 
     return WaitingLineService.get(id)
 
+@api.route('/api/waiting-lines/<int:id>', methods=['PUT'])
+def del_waiting_line(id):
+    if not is_logged():
+        return (jsonify({'message': 'Not Authorized' })), 401
+
+    return WaitingLineService.remove(id)
+
 
 @api.route('/api/waiting-lines/position', methods=['GET'])
 def get_position():

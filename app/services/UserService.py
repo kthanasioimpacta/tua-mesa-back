@@ -97,6 +97,7 @@ def get_auth_token(data):
                                       'created_at': format_datetime(g.user.created_at),
                                       'updated_at': format_datetime(g.user.updated_at)}}), 200)
   response.headers["Content-Type"] = "application/json"
+  response.headers["WWW-Authenticate"] = ""
   
   setCookie(response,token)
   return response

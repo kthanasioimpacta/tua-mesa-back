@@ -96,6 +96,30 @@ def get(id):
   response.headers["Content-Type"] = "application/json"
   return response
 
+def remove(id):
+  waiting_line = WaitingLine.query.filter(and_(WaitingLine.id==id,WaitingLine.company_id==g.user.company_id)).first()
+  if not waiting_line:
+      return (jsonify({'message': 'No Waiting Line found'}), 200)
+  resp = {'data': [],'summary': {}} 
+  
+  waiting_line.status = 0
+  db.session.add(waiting_line)
+  db.session.commit()
+  resp['data'].append( {  'id': waiting_line.id,
+                          'company_id': waiting_line.company_id,
+                          'name': waiting_line.name, 
+                          'is_priority': waiting_line.is_priority,
+                          'status': waiting_line.status,
+                          'created_at': format_datetime(waiting_line.created_at),
+                          'updated_at': format_datetime(waiting_line.updated_at),
+                          'qty_total': 0,
+                          'max_waiting_minutes': 0}
+                          )
+  response = flask.make_response(jsonify(resp), 200)
+  
+  response.headers["Content-Type"] = "application/json"
+  return response
+
 def getPosition(token):
   data = jwt.decode(token, current_app.config['SECRET_KEY'],
                   algorithms=['HS256'])
