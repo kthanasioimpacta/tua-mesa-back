@@ -53,6 +53,29 @@ def save(data):
   response.headers["Content-Type"] = "application/json"
   return response
 
+def update(id, data):
+  if not is_logged(): # TODO: VALIDAR SE O USUÁRIO PERTENCE A EMPRESA
+      return (jsonify({'message': 'Not Authorized' })), 401
+
+  line_up = LineUp.query.filter(and_(LineUp.id==id)).first()
+  line_up.status = data['status']
+  db.session.add(line_up)
+  db.session.commit()
+  if line_up.status == 3:
+    body = 'Atendimento concluído!'
+  else:  
+    body = 'Atendimento Cancelado!'
+    
+  SendSms(line_up.customer_id, body)
+  response = flask.make_response(jsonify({ 'data': {
+                                      'id': line_up.id,
+                                      'customer_id': line_up.customer_id,
+                                      'waiting_line_id': line_up.waiting_line_id,
+                                      'status': line_up.status,
+                                      'joined_at': format_datetime(line_up.joined_at)}}), 201)
+  response.headers["Content-Type"] = "application/json"
+  return response
+
 def get_next_customer(waiting_line_id):
   
   line_up = LineUp()

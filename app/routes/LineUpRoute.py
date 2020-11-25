@@ -25,6 +25,10 @@ def new_line_up():
 
     return LineUpService.save(request.get_json())
 
+@api.route('/api/line-ups/<int:id>', methods=['PUT'])
+def update_line_up(id):
+    return LineUpService.update(id,request.get_json())
+
 @api.route('/api/line-ups', methods=['GET'])
 def list_line_up():
     if not is_logged(): # TODO: VALIDAR SE O USUÁRIO PERTENCE A EMPRESA
