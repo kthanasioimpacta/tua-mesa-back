@@ -62,7 +62,7 @@ def update(id, data):
   db.session.add(line_up)
   db.session.commit()
   if line_up.status == 3:
-    body = 'Atendimento concluído!'
+    body = 'Atendimento concluído! Agradecemos por sua presença!'
   else:  
     body = 'Atendimento Cancelado!'
     
