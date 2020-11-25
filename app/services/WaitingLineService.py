@@ -152,7 +152,7 @@ def exitPosition(token):
   data = jwt.decode(token, current_app.config['SECRET_KEY'],
                   algorithms=['HS256'])
   line_up_id = data[ 'line_up_id']
-  line_up = LineUp.query.filter_by(LineUp.id==line_up_id).first()
+  line_up = LineUp.query.filter_by(line_up_id).first()
   line_up.status = 4
   db.session.add(line_up)
   db.session.commit()
