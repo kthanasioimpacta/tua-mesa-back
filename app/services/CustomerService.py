@@ -21,6 +21,7 @@ def save(data):
   if 'email' in data:
       email = data['email']
   customer = Customer.query.filter(and_(Customer.phone_region==phone_region,Customer.phone_number==phone_number)).first()
+  print(customer)
   if customer is not None:
       response = flask.make_response(jsonify({ 'data': {
                                       'id': customer.id,
