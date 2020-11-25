@@ -55,3 +55,7 @@ def del_waiting_line(id):
 @api.route('/api/waiting-lines/position', methods=['GET'])
 def get_position():
     return WaitingLineService.getPosition(request.args['token'])
+
+@api.route('/api/waiting-lines/position', methods=['PUT'])
+def exit_position():
+    return WaitingLineService.exitPosition(request.args['token'])
