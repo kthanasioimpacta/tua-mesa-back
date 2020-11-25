@@ -20,16 +20,8 @@ def save(data):
   email = None
   if 'email' in data:
       email = data['email']
-  customer = Customer(name=name,
-              phone_number=phone_number, 
-              phone_region=phone_region, 
-              description=description,
-              email=email,
-              status=1, # ATIVO
-              created_at=datetime.now(),
-              updated_at=datetime.now())
-
-  if customer.query.filter(and_(Customer.phone_region==phone_region,Customer.phone_number==phone_number)).first() is not None:
+  customer = Customer.query.filter(and_(Customer.phone_region==phone_region,Customer.phone_number==phone_number)).first()
+  if customer is not None:
       response = flask.make_response(jsonify({ 'data': {
                                       'id': customer.id,
                                       'name': customer.name, 
@@ -43,6 +35,14 @@ def save(data):
       response.headers["Content-Type"] = "application/json"
       return response
 
+  customer = Customer(name=name,
+              phone_number=phone_number, 
+              phone_region=phone_region, 
+              description=description,
+              email=email,
+              status=1, # ATIVO
+              created_at=datetime.now(),
+              updated_at=datetime.now())
   # user.hash_password(data['password'])
   db.session.add(customer)
   db.session.commit()
