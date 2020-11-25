@@ -32,8 +32,8 @@ def save(data):
   if not is_logged(): # TODO: VALIDAR SE O USUÁRIO PERTENCE A EMPRESA
       return (jsonify({'message': 'Not Authorized' })), 401
 
-  if line_up.query.filter(and_(LineUp.customer_id==data['customer_id'],LineUp.status < 3)).first() is not None:
-      return (jsonify({'message': 'Customer already in an active Waiting Line'}), 400)
+  # if line_up.query.filter(and_(LineUp.customer_id==data['customer_id'],LineUp.status < 3)).first() is not None:
+  #     return (jsonify({'message': 'Customer already in an active Waiting Line'}), 400)
 
   db.session.add(line_up)
   db.session.commit()
