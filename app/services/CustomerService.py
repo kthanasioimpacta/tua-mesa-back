@@ -7,7 +7,7 @@ from sqlalchemy import and_
 from app.shared.Util import format_datetime
 from app.models.Customer import Customer
 
-def save(data):
+def save(data): 
   name = data['name']
   if 'phone_region' not in data:
       phone_region = '+55'
@@ -30,7 +30,18 @@ def save(data):
               updated_at=datetime.now())
 
   if customer.query.filter(and_(Customer.phone_region==phone_region,Customer.phone_number==phone_number)).first() is not None:
-      return (jsonify({'message': 'Customer already exists'}), 400)
+      response = flask.make_response(jsonify({ 'data': {
+                                      'id': customer.id,
+                                      'name': customer.name, 
+                                      'phone_region': customer.phone_region,
+                                      'phone_number': customer.phone_number,
+                                      'description': description,
+                                      'email': email,
+                                      'status': customer.status,
+                                      'created_at': format_datetime(customer.created_at),
+                                      'updated_at': format_datetime(customer.updated_at)}}), 201)
+      response.headers["Content-Type"] = "application/json"
+      return response
 
   # user.hash_password(data['password'])
   db.session.add(customer)
